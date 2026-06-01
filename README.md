@@ -146,30 +146,25 @@ Given a, b ∈ ℝ^m and k ∈ [0,1]:
 
 ### Execution time vs N (sorting algorithms)
 
-<p float="left">
-  <img src="HW1/resultados/graficas/tiempo_vs_N_m2.png" width="30%" />
-  <img src="HW1/resultados/graficas/tiempo_vs_N_m3.png" width="30%" />
-  <img src="HW1/resultados/graficas/tiempo_vs_N_m10.png" width="30%" />
-</p>
+| m=2 | m=3 | m=10 |
+|:---:|:---:|:----:|
+| ![time vs N m=2](HW1/resultados/graficas/tiempo_vs_N_m2.png) | ![time vs N m=3](HW1/resultados/graficas/tiempo_vs_N_m3.png) | ![time vs N m=10](HW1/resultados/graficas/tiempo_vs_N_m10.png) |
 
 *Execution time (linear and log-log scales) for m = 2, 3, 10 with N ranging from 10 to 10000. M3 and MTF are ≈17× faster than Naive for m=2 at N=10000.*
 
 ### Pareto fronts (DTLZ2)
 
-<p float="left">
-  <img src="HW1/resultados/figuras/frente_N100_m2.png" width="30%" />
-  <img src="HW1/resultados/figuras/frente_N100_m3.png" width="30%" />
-  <img src="HW1/resultados/figuras/frente_N100_m10.png" width="30%" />
-</p>
+| m=2 | m=3 | m=10 (PCA) |
+|:---:|:---:|:----------:|
+| ![front m=2](HW1/resultados/figuras/frente_N100_m2.png) | ![front m=3](HW1/resultados/figuras/frente_N100_m3.png) | ![front m=10](HW1/resultados/figuras/frente_N100_m10.png) |
 
 *Pareto fronts obtained with NSGA-II for m = 2, 3, 10 (PCA projection for m=10) with N=100.*
 
 ### RSE & (1-K)-Dominance demos
 
-<p float="left">
-  <img src="HW1/resultados/figuras/rse_demo.png" width="45%" />
-  <img src="HW1/resultados/figuras/one_k_dominance_demo.png" width="45%" />
-</p>
+| RSE subset selection | (1-K)-dominance |
+|:-------------------:|:---------------:|
+| ![RSE demo](HW1/resultados/figuras/rse_demo.png) | ![(1-K)-dominance demo](HW1/resultados/figuras/one_k_dominance_demo.png) |
 
 *Left: 10 points selected out of 50 using RSE. Right: (1-K)-dominance with k = 0, 0.25, 0.5.*
 
