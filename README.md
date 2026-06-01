@@ -1,11 +1,10 @@
 # 🧬 EMO-CICESE-Practices
 
-**Evolutionary Multi-Objective Optimization**  
-**CICESE** — Centro de Investigación Científica y de Educación Superior de Ensenada
+**Evolutionary Multi-Objective Optimization** · CICESE
 
 | | |
 |---|---|
-| **Student** | Javier Ramírez González ([javier.ramirez@cicese.edu.mx](mailto:javier.ramirez@cicese.edu.mx)) |
+| **Student** | Javier Ramírez González |
 | **Instructor** | Dr. Jesús Guillermo Falcón Cardona |
 | **Semester** | 2026-2 |
 
@@ -13,177 +12,113 @@
 
 ## 📋 Overview
 
-Hands-on lab assignments for the course *Evolutionary Multi-Objective Optimization*. This repository contains implementations, experiments, and reports on non-dominated sorting algorithms, density estimators, relaxed dominance relations, and NSGA-II variants.
-
-> ⏳ *More assignments will be added as the course progresses.*
+Hands-on assignments for the *Evolutionary Multi-Objective Optimization* course. Implements non-dominated sorting algorithms, density estimators, relaxed dominance relations, and NSGA-II variants.
 
 ---
 
-## 📂 Repository Structure
+## 🚀 Quick Start
 
-```
-EMO-CICESE-Practices/
-├── HW1/                          # Homework 1 — Non-dominated sorting algorithms & NSGA-II variants
-│   ├── EMO_HW1.pdf               # LaTeX report (PDF)
-│   ├── HW1_JR.ipynb              # Jupyter Notebook with full report
-│   ├── HW1_JR.pdf                # Report exported from notebook
-│   ├── nd_algorithms.py          # Non-dominated sorting (Naive, Bentley MTF, M3)
-│   ├── moea_module.py            # MOEA components: RSE, (1-K)-dominance, NSGA-II variants
-│   ├── gen_moea.py               # Notebook cell generation script
-│   ├── HW1_JR_images/            # 54 figures embedded in the notebook
-│   └── resultados/
-│       ├── csv/                  # Numerical results (averaged and detailed)
-│       ├── figuras/              # Pareto fronts 2D/3D/10D and demo plots
-│       └── graficas/             # Time vs N plots
-├── LICENSE                       # MIT License
-└── README.md
+### Conda (recommended)
+
+```bash
+conda env create -f environment.yml
+conda activate emo-cicese
 ```
 
----
+### pip
 
-## 🧪 Homework 1 — Non-Dominated Sorting Algorithms
-
-### Implemented Algorithms
-
-Three algorithms for finding the **non-dominated set** of `N` points in `m` dimensions:
-
-| Algorithm | Worst case | Average case (uniform) |
-|-----------|-----------|------------------------|
-| **Naive** | O(mN²)    | O(mN²) |
-| **Bentley MTF** | O(mN²) | O(N^{1+o(1)} + mN) |
-| **M3** | O(mN²) | O(N^{1+o(1)} + mN) |
-
-#### Naive
-
-```
-1:  dominated ← boolean array of size N (initialized False)
-2:  for i in {0..N-1}:
-3:      for j in {0..N-1}, j ≠ i:
-4:          if A[j] dominates A[i]:
-5:              dominated[i] ← True
-6:              break
-7:  return indices where dominated is False
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-#### Bentley with Move-To-Front (MTF)
+### Docker (maximal reproducibility)
 
-```
-1:  active ← empty list
-2:  for each point p in A:
-3:      dominated ← False
-4:      for each candidate q in active:
-5:          if q dominates p:
-6:              move q to front of active  (MTF heuristic)
-7:              dominated ← True
-8:              break
-9:          if p dominates q:
-10:             remove q from active
-11:     if not dominated:
-12:         append p to active
-13: return active
+```bash
+docker build -t emo-cicese .
+docker run -p 8888:8888 emo-cicese
 ```
 
-#### M3
+Open the Jupyter URL printed in the logs.
 
-```
-1:  active[0] ← 0, top ← 0
-2:  for each point p in A[1..N-1]:
-3:      j ← 0, dominated ← False
-4:      while j ≤ top:
-5:          q ← active[j]
-6:          if q dominates p:
-7:             swap active[0] ↔ active[j]
-8:             dominated ← True
-9:             break
-10:         if p dominates q:
-11:             swap active[j] ↔ active[top]
-12:             top ← top - 1
-13:         else:
-14:             j ← j + 1
-15:     if not dominated:
-16:         top ← top + 1
-17:         active[top] ← i
-18: return active[0..top]
+### Verify
+
+```bash
+python -c "
+import numpy, pandas, scipy, matplotlib, numba, pymoo, sklearn
+print('All dependencies OK')
+"
 ```
 
 ---
 
-### 🧪 NSGA-II Variants
-
-Three algorithms evaluated on 7 benchmark problems (DTLZ1, DTLZ2, DTLZ7, WFG1, WFG3, IDTLZ1, IDTLZ2) with `m ∈ {2,3,5,8,10}`, 30 runs each, using **Hypervolume (HV)** as the quality metric:
-
-| Algorithm | Description |
-|-----------|-------------|
-| **NSGA-II** | Classic algorithm with crowding distance (baseline) |
-| **RSE-NSGA-II** | Replaces crowding distance with **Riesz s-Energy** density estimator (greedy removal) |
-| **R-NSGA-II** | Replaces Pareto dominance with **(1-K)-dominance** (tolerates being worse in up to `k·m` objectives) |
-
-#### RSE (Riesz s-Energy)
+## 📁 Structure
 
 ```
-1: Normalize objectives F → [0,1]
-2: Compute Riesz energy matrix: K_ij = 1 / ‖f_i - f_j‖^s
-3: contrib ← row-wise sum of K
-4: While n_alive > n_survive:
-5:     idx = argmax(contrib)      # point with highest energy contribution
-6:     remove idx from set
-7:     contrib ← contrib - K[:, idx]
-8: Return surviving indices
+├── HW1/          # Homework 1 — ND sorting & NSGA-II variants
+├── LICENSE
+├── README.md
+├── requirements.txt
+├── environment.yml
+└── Dockerfile
 ```
 
-#### (1-K)-Dominance
-
-```
-Given a, b ∈ ℝ^m and k ∈ [0,1]:
-    a (1-k)-dominates b iff:
-        |{i : a_i ≤ b_i}| ≥ m - ⌊k·m⌋   (better or equal in at least m-k·m objectives)
-        and |{i : a_i < b_i}| ≥ 1        (strictly better in at least one)
-```
+> More assignments will be added as the course progresses.
 
 ---
 
-## 📊 Key Plots
+## 🧪 Homework 1 — Non-Dominated Sorting & NSGA-II Variants
 
-### Execution time vs N (sorting algorithms)
+### ND Sorting Algorithms
 
-| m=2 | m=3 | m=10 |
-|:---:|:---:|:----:|
-| ![time vs N m=2](HW1/resultados/graficas/tiempo_vs_N_m2.png) | ![time vs N m=3](HW1/resultados/graficas/tiempo_vs_N_m3.png) | ![time vs N m=10](HW1/resultados/graficas/tiempo_vs_N_m10.png) |
+| Algorithm | Complexity | Performance (m=2, N=10K) |
+|-----------|-----------|--------------------------|
+| **Naive** | O(mN²) | ~0.86 ms |
+| **Bentley MTF** | O(mN²) avg O(N^{1+o(1)}) | ~0.06 ms |
+| **M3** | O(mN²) avg O(N^{1+o(1)}) | ~0.05 ms |
 
-*Execution time (linear and log-log scales) for m = 2, 3, 10 with N ranging from 10 to 10000. M3 and MTF are ≈17× faster than Naive for m=2 at N=10000.*
+[Pseudocode](HW1/nd_algorithms.py) for all three.
 
-### Pareto fronts (DTLZ2)
+### NSGA-II Variants
 
-| m=2 | m=3 | m=10 (PCA) |
-|:---:|:---:|:----------:|
-| ![front m=2](HW1/resultados/figuras/frente_N100_m2.png) | ![front m=3](HW1/resultados/figuras/frente_N100_m3.png) | ![front m=10](HW1/resultados/figuras/frente_N100_m10.png) |
+| Variant | Key Idea |
+|---------|----------|
+| **NSGA-II** | Baseline with crowding distance |
+| **RSE-NSGA-II** | Replaces crowding distance with Riesz s-Energy density |
+| **R-NSGA-II** | Uses (1-K)-dominance (tolerates worse in ≤ k·m objectives) |
 
-*Pareto fronts obtained with NSGA-II for m = 2, 3, 10 (PCA projection for m=10) with N=100.*
+Evaluated on DTLZ1/2/7, WFG1/3, IDTLZ1/2 with m∈{2,3,5,8,10}, 30 runs each, measured via Hypervolume (HV).
 
-### RSE & (1-K)-Dominance demos
+### Key Results
 
-| RSE subset selection | (1-K)-dominance |
+| | m=2 | m=3 | m=10 |
+|:---:|:---:|:---:|:----:|
+| **Time vs N** | ![time m=2](HW1/resultados/graficas/tiempo_vs_N_m2.png) | ![time m=3](HW1/resultados/graficas/tiempo_vs_N_m3.png) | ![time m=10](HW1/resultados/graficas/tiempo_vs_N_m10.png) |
+| **Pareto front** | ![front m=2](HW1/resultados/figuras/frente_N100_m2.png) | ![front m=3](HW1/resultados/figuras/frente_N100_m3.png) | ![front m=10 PCA](HW1/resultados/figuras/frente_N100_m10.png) |
+
+| RSE subset selection | (1-K)-Dominance |
 |:-------------------:|:---------------:|
-| ![RSE demo](HW1/resultados/figuras/rse_demo.png) | ![(1-K)-dominance demo](HW1/resultados/figuras/one_k_dominance_demo.png) |
+| ![RSE](HW1/resultados/figuras/rse_demo.png) | ![(1-K)](HW1/resultados/figuras/one_k_dominance_demo.png) |
 
-*Left: 10 points selected out of 50 using RSE. Right: (1-K)-dominance with k = 0, 0.25, 0.5.*
+Full report: [`HW1/HW1_JR.ipynb`](HW1/HW1_JR.ipynb)
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Tool | Purpose |
+| Tool | Version |
 |------|---------|
-| Python 3.12 | Core language |
-| NumPy | Numerical computing |
-| Numba | JIT compilation (ND algorithms) |
-| pymoo | MOEA framework (NSGA-II, benchmarks) |
-| SciPy | RSE (pdist), PCA |
-| Matplotlib | Visualization |
-| Jupyter | Interactive report |
+| Python | 3.12.2 |
+| NumPy | 2.3.5 |
+| pandas | 2.2.3 |
+| SciPy | 1.15.3 |
+| Matplotlib | 3.10.7 |
+| Numba | 0.62.1 |
+| pymoo | 0.6.1.6 |
+| scikit-learn | 1.7.2 |
 
 ---
 
 ## 📄 License
 
-MIT License — Copyright © 2026 Javier Ramírez González
+MIT — © 2026 Javier Ramírez
